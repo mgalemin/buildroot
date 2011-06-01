@@ -1,7 +1,5 @@
 #
-# Automatically generated make config: don't edit
-# Buildroot 2011.05-g8febe40 Configuration
-# Tue May 31 22:49:25 2011
+# Buildroot 2011.05 Configuration
 #
 BR2_HAVE_DOT_CONFIG=y
 BR2_arm=y
@@ -669,6 +667,7 @@ BR2_PACKAGE_BASH=y
 # BR2_PACKAGE_FILE is not set
 # BR2_PACKAGE_LOCKFILE_PROGS is not set
 BR2_PACKAGE_LOGROTATE=y
+BR2_PACKAGE_MC=y
 BR2_PACKAGE_MONIT=y
 BR2_PACKAGE_SCREEN=y
 # BR2_PACKAGE_SUDO is not set

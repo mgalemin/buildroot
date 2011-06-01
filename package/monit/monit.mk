@@ -16,7 +16,9 @@ MONIT_DEPENDENCIES += openssl
 endif
 
 define MONIT_INSTALL_TARGET_CMDS
-	$(INSTALL) -m 0755 $(@D)/src/monit $(TARGET_DIR)/usr/bin/monit
+	$(INSTALL) -m 0755 $(@D)/monit $(TARGET_DIR)/usr/bin/monit
+	$(INSTALL) -m 0644 $(@D)/monitrc $(TARGET_DIR)/etc/monitrc
+	$(INSTALL) -d -m 0777 $(TARGET_DIR)/etc/monit.d
 endef
 
 define MONIT_UNINSTALL_TARGET_CMDS
