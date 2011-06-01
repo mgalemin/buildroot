@@ -5,9 +5,6 @@
 #############################################################
 MONIT_VERSION = 5.2.5
 MONIT_SITE = http://mmonit.com/monit/dist/
-MONIT_DIR = $(BUILD_DIR)/monit-$(MONIT_VERSION)
-MONIT_SOURCE = monit-$(MONIT_VERSION).tar.gz
-MONIT_INSTALL_TARGET_OPT = DESTDIR=$(TARGET_DIR) install
 
 ifneq ($(BR2_PACKAGE_OPENSSL),y)
 MONIT_CONF_OPT += --without-ssl
@@ -18,8 +15,14 @@ MONIT_CONF_OPT += \
 MONIT_DEPENDENCIES += openssl
 endif
 
-$(eval $(call AUTOTARGETS,package/etherstack,monit))
+define MONIT_INSTALL_TARGET_CMDS
+	$(INSTALL) -m 0755 $(@D)/monit $(TARGET_DIR)/usr/bin/monit
+	$(INSTALL) -m 0644 $(@D)/monitrc $(TARGET_DIR)/etc/monitrc
+	$(INSTALL) -d -m 0777 $(TARGET_DIR)/etc/monit.d
+endef
 
-$(MONIT_HOOK_POST_CONFIGURE):
-	sed -i -e "s:-I/usr/include:-I$(STAGING_DIR)/usr/include:" \
-	-e "s:-L/usr/lib:-L$(STAGING_DIR)/usr/lib:" $(MONIT_DIR)/Makefile;
+define MONIT_UNINSTALL_TARGET_CMDS
+	rm -f $(TARGET_DIR)/usr/bin/monit
+endef
+
+$(eval $(call AUTOTARGETS,package,monit))
