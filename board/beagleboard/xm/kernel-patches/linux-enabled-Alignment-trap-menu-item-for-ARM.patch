@@ -1,0 +1,35 @@
+From 8a1019cf1ee09cecfe9b17cbab2f6804fad1bb0a Mon Sep 17 00:00:00 2001
+From: Maksym Galemin <maksim.galemin@gmail.com>
+Date: Sat, 28 May 2011 10:20:11 +1000
+Subject: [PATCH] Issue 1: enabled "Alignment trap" menu item for ARM architecture.
+
+---
+ arch/arm/Kconfig                     |    2 +-
+ arch/arm/configs/omap2plus_defconfig |    1 +
+ 2 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 377a7a5..ed31252 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -1621,7 +1621,7 @@ config LEDS_CPU
+ 	  will overrule the CPU usage LED.
+ 
+ config ALIGNMENT_TRAP
+-	bool
++	bool "Alignment trap"
+ 	depends on CPU_CP15_MMU
+ 	default y if !ARCH_EBSA110
+ 	select HAVE_PROC_CPU if PROC_FS
+diff --git a/arch/arm/configs/omap2plus_defconfig b/arch/arm/configs/omap2plus_defconfig
+index 076db52..8d32420 100644
+--- a/arch/arm/configs/omap2plus_defconfig
++++ b/arch/arm/configs/omap2plus_defconfig
+@@ -303,3 +303,4 @@ CONFIG_CRC_T10DIF=y
+ CONFIG_CRC_ITU_T=y
+ CONFIG_CRC7=y
+ CONFIG_LIBCRC32C=y
++# CONFIG_ALIGNMENT_TRAP is not set
+-- 
+1.7.4.1
+
