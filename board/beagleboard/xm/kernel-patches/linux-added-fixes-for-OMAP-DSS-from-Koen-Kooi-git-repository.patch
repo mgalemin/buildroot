@@ -1,0 +1,81 @@
+From e3dd8dcf37976c1aefc3f269ec295c89a38103bd Mon Sep 17 00:00:00 2001
+From: Max Galemin <maksim.galemin@gmail.com>
+Date: Sun, 29 May 2011 12:56:33 +1000
+Subject: [PATCH 4/7] Issue 5: added fixes for OMAP DSS from Koen Kooi git repository:
+
+1. Patches applied (see http://dominion.thruhere.net/git/cgit.cgi/linux-omap/ for details):
+  a) OMAP2PLUS: DSS2: Fix: Return correct lcd clock source for OMAP2/3 (Archit Taneja <archit@ti.com>);
+  b) OMAP: DSS: DSI: Fix DSI PLL power bug (Tomi Valkeinen <tomi.valkeinen@ti.com>).
+---
+ drivers/video/omap2/dss/dsi.c          |    5 +++++
+ drivers/video/omap2/dss/dss.c          |   10 ++++++++--
+ drivers/video/omap2/dss/dss_features.c |    2 +-
+ drivers/video/omap2/dss/dss_features.h |    2 ++
+ 4 files changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/video/omap2/dss/dsi.c b/drivers/video/omap2/dss/dsi.c
+index 0a7f1a4..5945283 100644
+--- a/drivers/video/omap2/dss/dsi.c
++++ b/drivers/video/omap2/dss/dsi.c
+@@ -1059,6 +1059,11 @@ static int dsi_pll_power(enum dsi_pll_power_state state)
+ {
+ 	int t = 0;
+ 
++	/* DSI-PLL power command 0x3 is not working */
++	if (dss_has_feature(FEAT_DSI_PLL_PWR_BUG) &&
++		state == DSI_PLL_POWER_ON_DIV)
++		state = DSI_PLL_POWER_ON_ALL;
++
+ 	REG_FLD_MOD(DSI_CLK_CTRL, state, 31, 30);	/* PLL_PWR_CMD */
+ 
+ 	/* PLL_PWR_STATUS */
+diff --git a/drivers/video/omap2/dss/dss.c b/drivers/video/omap2/dss/dss.c
+index 3f1fee6..c3b48a0 100644
+--- a/drivers/video/omap2/dss/dss.c
++++ b/drivers/video/omap2/dss/dss.c
+@@ -385,8 +385,14 @@ enum dss_clk_source dss_get_dsi_clk_source(void)
+ 
+ enum dss_clk_source dss_get_lcd_clk_source(enum omap_channel channel)
+ {
+-	int ix = channel == OMAP_DSS_CHANNEL_LCD ? 0 : 1;
+-	return dss.lcd_clk_source[ix];
++	if (dss_has_feature(FEAT_LCD_CLK_SRC)) {
++		int ix = channel == OMAP_DSS_CHANNEL_LCD ? 0 : 1;
++		return dss.lcd_clk_source[ix];
++	} else {
++		/* LCD_CLK source is the same as DISPC_FCLK source for
++		 * OMAP2 and OMAP3 */
++		return dss.dispc_clk_source;
++	}
+ }
+ 
+ /* calculate clock rates using dividers in cinfo */
+diff --git a/drivers/video/omap2/dss/dss_features.c b/drivers/video/omap2/dss/dss_features.c
+index aa16222..8c50e18 100644
+--- a/drivers/video/omap2/dss/dss_features.c
++++ b/drivers/video/omap2/dss/dss_features.c
+@@ -271,7 +271,7 @@ static struct omap_dss_features omap3630_dss_features = {
+ 		FEAT_LCDENABLESIGNAL | FEAT_PCKFREEENABLE |
+ 		FEAT_PRE_MULT_ALPHA | FEAT_FUNCGATED |
+ 		FEAT_ROWREPEATENABLE | FEAT_LINEBUFFERSPLIT |
+-		FEAT_RESIZECONF,
++		FEAT_RESIZECONF | FEAT_DSI_PLL_PWR_BUG,
+ 
+ 	.num_mgrs = 2,
+ 	.num_ovls = 3,
+diff --git a/drivers/video/omap2/dss/dss_features.h b/drivers/video/omap2/dss/dss_features.h
+index 12e9c4e..37922ce 100644
+--- a/drivers/video/omap2/dss/dss_features.h
++++ b/drivers/video/omap2/dss/dss_features.h
+@@ -40,6 +40,8 @@ enum dss_feat_id {
+ 	/* Independent core clk divider */
+ 	FEAT_CORE_CLK_DIV	= 1 << 11,
+ 	FEAT_LCD_CLK_SRC	= 1 << 12,
++	/* DSI-PLL power command 0x3 is not working */
++	FEAT_DSI_PLL_PWR_BUG	= 1 << 13,
+ };
+ 
+ /* DSS register field id */
+-- 
+1.7.4.1
+
