@@ -31,6 +31,7 @@ endchoice
 source "toolchain/toolchain-buildroot/Config.in"
 source "toolchain/toolchain-external/Config.in"
 source "toolchain/toolchain-crosstool-ng/Config.in"
+source "package/binutils/Config.in.host"
 source "toolchain/toolchain-common.in"
 source "toolchain/toolchain-buildroot/Config.in.2"
 
