@@ -140,4 +140,9 @@ config BR2_TARGET_UBOOT_ETH1ADDR
 
 endif # BR2_TARGET_UBOOT_NETWORK
 
+config BR2_TARGET_UBOOT_DEFAULT_UENV
+	bool "generate default uEnv.txt"
+	help
+	  Generate uEnv.txt file with default U-Boot parameters.
+
 endif # BR2_TARGET_UBOOT
