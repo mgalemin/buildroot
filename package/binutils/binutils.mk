@@ -36,10 +36,11 @@ HOST_BINUTILS_CONF_OPT = --disable-multilib --disable-werror \
 # We just want libbfd, not the full-blown binutils in staging
 define BINUTILS_INSTALL_STAGING_CMDS
 	$(MAKE) -C $(@D)/bfd DESTDIR=$(STAGING_DIR) install
+	$(MAKE) -C $(@D)/libiberty DESTDIR=$(STAGING_DIR) install
 endef
 
 # only libbfd in the target...
-BINUTILS_INSTALL_FROM = $(@D)/bfd
+BINUTILS_INSTALL_FROM = $(@D)/bfd $(@D)/libiberty
 
 # unless we want full...
 ifeq ($(BR2_PACKAGE_BINUTILS_TARGET),y)

@@ -1,0 +1,68 @@
+From bb8ddf64d7b099994654fdf26c9dd8c16d8e0e35 Mon Sep 17 00:00:00 2001
+From: Maksym Galemin <maksim.galemin@gmail.com>
+Date: Sat, 28 May 2011 10:41:06 +1000
+Subject: [PATCH 2/7] Issue 3: enabled 1 GHz clock for Beagleboard-xM.
+
+---
+ arch/arm/mach-omap2/board-omap3beagle.c |   17 +++++++++++++----
+ arch/arm/plat-omap/clock.c              |    2 +-
+ 2 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/mach-omap2/board-omap3beagle.c b/arch/arm/mach-omap2/board-omap3beagle.c
+index 33007fd..5ae251a 100644
+--- a/arch/arm/mach-omap2/board-omap3beagle.c
++++ b/arch/arm/mach-omap2/board-omap3beagle.c
+@@ -629,14 +629,23 @@ static void __init beagle_opp_init(void)
+ 				__func__, mh, dh);
+ 			return;
+ 		}
++
++#ifdef CONFIG_OMAP_SMARTREFLEX
++		unsigned long mpu_freq = 1000000000;
++		unsigned long dsp_freq = 800000000;
++#else
++		unsigned long mpu_freq = 800000000;
++		unsigned long dsp_freq = 660000000;
++#endif
++
+ 		/* Enable MPU 1GHz and lower opps */
+ 		dev = &mh->od->pdev.dev;
+-		r = opp_enable(dev, 800000000);
++		r = opp_enable(dev, mpu_freq);
+ 		/* TODO: MPU 1GHz needs SR and ABB */
+ 
+ 		/* Enable IVA 800MHz and lower opps */
+ 		dev = &dh->od->pdev.dev;
+-		r |= opp_enable(dev, 660000000);
++		r |= opp_enable(dev, dsp_freq);
+ 		/* TODO: DSP 800MHz needs SR and ABB */
+ 		if (r) {
+ 			pr_err("%s: failed to enable higher opp %d\n",
+@@ -646,9 +655,9 @@ static void __init beagle_opp_init(void)
+ 			 * about the results
+ 			 */
+ 			dev = &mh->od->pdev.dev;
+-			opp_disable(dev, 800000000);
++			opp_disable(dev, mpu_freq);
+ 			dev = &dh->od->pdev.dev;
+-			opp_disable(dev, 660000000);
++			opp_disable(dev, dsp_freq);
+ 		}
+ 	}
+ 	return;
+diff --git a/arch/arm/plat-omap/clock.c b/arch/arm/plat-omap/clock.c
+index c9122dd..6d12f35 100644
+--- a/arch/arm/plat-omap/clock.c
++++ b/arch/arm/plat-omap/clock.c
+@@ -185,7 +185,7 @@ static int __init omap_clk_setup(char *str)
+ 	if (!mpurate)
+ 		return 1;
+ 
+-	if (mpurate < 1000)
++	if (mpurate <= 1000)
+ 		mpurate *= 1000000;
+ 
+ 	return 1;
+-- 
+1.7.4.1
+
