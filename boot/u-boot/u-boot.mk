@@ -130,13 +130,23 @@ endif # BR2_TARGET_UBOOT_NETWORK
 $(U_BOOT_DIR)/$(U_BOOT_BIN): $(U_BOOT_DIR)/.header_modified
 	$(TARGET_CONFIGURE_OPTS) \
 		$(U_BOOT_CONFIGURE_OPTS) \
-		$(MAKE) CROSS_COMPILE="$(CCACHE) $(TARGET_CROSS)" ARCH=$(U_BOOT_ARCH) \
+		$(MAKE) EXTRAVERSION=$(BR2_TARGET_UBOOT_EXTRAVERSION) \
+		CROSS_COMPILE="$(CCACHE) $(TARGET_CROSS)" \
+		ARCH=$(U_BOOT_ARCH) \
 		$(U_BOOT_MAKE_OPT) -C $(U_BOOT_DIR)
+
+U_BOOT_UENV_FILE:=uEnv.txt
 
 # Copy the result to the images/ directory
 $(BINARIES_DIR)/$(U_BOOT_BIN): $(U_BOOT_DIR)/$(U_BOOT_BIN)
 	rm -f $(BINARIES_DIR)/$(U_BOOT_BIN)
 	cp -dpf $(U_BOOT_DIR)/$(U_BOOT_BIN) $(BINARIES_DIR)/
+ifeq ($(BR2_TARGET_UBOOT_DEFAULT_UENV),y)
+	rm -f $(BINARIES_DIR)/$(U_BOOT_UENV_FILE)
+	echo "mpurate=1000" >> $(BINARIES_DIR)/$(U_BOOT_UENV_FILE)
+	echo "uenvcmd=mmc init; run loaduimage; run mmcboot" >> $(BINARIES_DIR)/$(U_BOOT_UENV_FILE)
+endif
+
 
 # Build just mkimage for the host. It might have already been built by
 # the U-Boot build procedure, but mkimage may also be needed even if

@@ -52,6 +52,13 @@ config BR2_TARGET_UBOOT_VERSION
 	default "2010.03"	if BR2_TARGET_UBOOT_2010_03
 	default "custom"	if BR2_TARGET_UBOOT_CUSTOM_TARBALL
 
+config BR2_TARGET_UBOOT_EXTRAVERSION
+	string "U-Boot Extraversion"
+	default ""
+	help
+	  U-Boot extraversion string
+
+
 config BR2_TARGET_UBOOT_CUSTOM_PATCH_DIR
 	string "custom patch dir"
 	help
@@ -132,5 +139,10 @@ config BR2_TARGET_UBOOT_ETH1ADDR
 	  Target MAC address for the second ethernet interface.
 
 endif # BR2_TARGET_UBOOT_NETWORK
+
+config BR2_TARGET_UBOOT_DEFAULT_UENV
+	bool "generate default uEnv.txt"
+	help
+	  Generate uEnv.txt file with default U-Boot parameters.
 
 endif # BR2_TARGET_UBOOT
