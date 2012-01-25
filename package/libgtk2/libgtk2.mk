@@ -66,9 +66,7 @@ LIBGTK2_CONF_ENV = ac_cv_func_posix_getpwuid_r=yes glib_cv_stack_grows=no \
 		ac_cv_prog_F77=no \
 		ac_cv_path_CUPS_CONFIG=no
 
-LIBGTK2_CONF_OPT = --enable-shared \
-		--enable-static \
-		--disable-glibtest \
+LIBGTK2_CONF_OPT = --disable-glibtest \
 		--enable-explicit-deps=no \
 		--disable-debug
 
@@ -141,7 +139,7 @@ HOST_LIBGTK2_CONF_OPT = \
 		--disable-debug
 
 define HOST_LIBGTK2_PATCH_REDUCE_DEPENDENCIES_HOOK
- toolchain/patch-kernel.sh $(@D) $($(PKG)_DIR_PREFIX)/$($(NOHOSTPKG)_NAME) host-*.patch
+ support/scripts/apply-patches.sh $(@D) $($(PKG)_DIR_PREFIX)/$(RAWNAME) host-*.patch
 endef
 
 HOST_LIBGTK2_POST_PATCH_HOOKS += HOST_LIBGTK2_PATCH_REDUCE_DEPENDENCIES_HOOK
@@ -154,5 +152,5 @@ define HOST_LIBGTK2_INSTALL_CMDS
  cp $(@D)/gtk/gtk-update-icon-cache $(HOST_DIR)/usr/bin
 endef
 
-$(eval $(call AUTOTARGETS,package,libgtk2))
-$(eval $(call AUTOTARGETS,package,libgtk2,host))
+$(eval $(call AUTOTARGETS))
+$(eval $(call AUTOTARGETS,host))

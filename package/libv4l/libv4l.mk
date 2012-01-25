@@ -30,10 +30,6 @@ define LIBV4L_INSTALL_STAGING_CMDS
 	for i in $(LIBV4L_DIRS_y); do \
 		$(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(@D)/$$i \
 			DESTDIR=$(STAGING_DIR) $(LIBV4L_MAKE_OPTS) install; done
-	/bin/cp -a $(BUILD_DIR)/libv4l-$(LIBV4L_VERSION)/include/linux/videodev2.h \
-		$(STAGING_DIR)/usr/include/linux
-	/bin/ln -s $(STAGING_DIR)/usr/include/linux/videodev2.h \
-		$(STAGING_DIR)/usr/include/linux/videodev.h
 endef
 
 define LIBV4L_INSTALL_TARGET_CMDS
@@ -42,5 +38,5 @@ define LIBV4L_INSTALL_TARGET_CMDS
 			DESTDIR=$(TARGET_DIR) $(LIBV4L_MAKE_OPTS) install; done
 endef
 
-$(eval $(call GENTARGETS,package,libv4l))
+$(eval $(call GENTARGETS))
 

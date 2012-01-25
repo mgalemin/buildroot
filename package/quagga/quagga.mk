@@ -4,7 +4,7 @@
 #
 #############################################################
 
-QUAGGA_VERSION = 0.99.18
+QUAGGA_VERSION = 0.99.20
 QUAGGA_SITE = http://www.quagga.net/download
 
 QUAGGA_DEPENDENCIES = host-gawk
@@ -87,4 +87,4 @@ else
 QUAGGA_CONF_OPT+=--disable-opaque-lsa
 endif
 
-$(eval $(call AUTOTARGETS,package,quagga))
+$(eval $(call AUTOTARGETS))
