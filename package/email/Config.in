@@ -1,6 +1,0 @@
-config BR2_PACKAGE_EMAIL
-	bool "email"
-	help
-	  Email is a program for the Unix environment that sends messages.
-
-	  http://www.cleancode.org/projects/email
