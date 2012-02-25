@@ -4,7 +4,7 @@
 #
 #############################################################
 
-MIDORI_VERSION = 0.3.2
+MIDORI_VERSION = 0.3.6
 MIDORI_SOURCE = midori-$(MIDORI_VERSION).tar.bz2
 MIDORI_SITE = http://archive.xfce.org/src/apps/midori/0.3/
 MIDORI_INSTALL_TARGET = YES
@@ -35,4 +35,4 @@ define MIDORI_INSTALL_TARGET_CMDS
        (cd $(@D); ./waf --destdir=$(TARGET_DIR) install)
 endef
 
-$(eval $(call GENTARGETS,package,midori))
+$(eval $(call GENTARGETS))

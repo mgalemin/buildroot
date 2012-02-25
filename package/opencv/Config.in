@@ -1,98 +1,90 @@
 config BR2_PACKAGE_OPENCV
 	bool "opencv"
+	select BR2_PACKAGE_ZLIB
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on BR2_USE_WCHAR
 	help
-	  OpenCV (Open Source Computer Vision) is a library of programming 
+	  OpenCV (Open Source Computer Vision) is a library of programming
 	  functions for real time computer vision.
 
-	  http://opencv.willowgarage.com/
+	  http://opencv.willowgarage.com/wiki/
 
-config BR2_PACKAGE_OPENCV_JPEG
-	bool "JPEG support"
-	depends on BR2_PACKAGE_OPENCV
+if BR2_PACKAGE_OPENCV
+
+config BR2_PACKAGE_OPENCV_BUILD_TESTS
+	bool "build tests"
+
+config BR2_PACKAGE_OPENCV_INSTALL_DATA
+	bool "install extra data"
+	help
+	  Install various data that is used by cv libraries and/or demo
+	  applications, specifically for haarcascades and lbpcascades
+	  features.
+
+	  For further information: see OpenCV documentation.
+
+comment "Build options"
+
+config BR2_PACKAGE_OPENCV_WITH_PYTHON
+	bool "python support"
+	depends on BR2_PACKAGE_PYTHON
+
+config BR2_PACKAGE_OPENCV_WITH_FFMPEG
+	bool "ffmpeg support"
+	depends on BR2_LARGEFILE
+	depends on BR2_INET_IPV6
+	select BR2_PACKAGE_FFMPEG
+	select BR2_PACKAGE_FFMPEG_SWSCALE
+	help
+	  Use ffmpeg from the target system.
+
+comment "ffmpeg support requires a toolchain with LARGEFILE and IPV6 support"
+	depends on !(BR2_LARGEFILE && BR2_INET_IPV6)
+
+config BR2_PACKAGE_OPENCV_WITH_GSTREAMER
+	bool "gstreamer support"
+	select BR2_PACKAGE_GSTREAMER
+	select BR2_PACKAGE_GST_PLUGINS_BASE
+	select BR2_PACKAGE_GST_PLUGINS_BASE_PLUGIN_APP
+
+config BR2_PACKAGE_OPENCV_WITH_GTK
+	bool "gtk support"
+	depends on BR2_PACKAGE_LIBGTK2
+
+config BR2_PACKAGE_OPENCV_WITH_QT
+	bool "qt backend support"
+	depends on BR2_PACKAGE_QT
+	default y
+
+config BR2_PACKAGE_OPENCV_WITH_JPEG
+	bool "jpeg support"
 	select BR2_PACKAGE_JPEG
 	help
-	  Enable JPEG library support for OpenCV.
+	  Use shared libjpeg from the target system.
 
-config BR2_PACKAGE_OPENCV_TIFF
-	bool "TIFF support"
-	depends on BR2_PACKAGE_OPENCV
-	select BR2_PACKAGE_TIFF
-	help
-	  Enable TIFF library support for OpenCV.
-
-config BR2_PACKAGE_OPENCV_LIBPNG
-	bool "PNG support"
-	depends on BR2_PACKAGE_OPENCV
+config BR2_PACKAGE_OPENCV_WITH_PNG
+	bool "png support"
 	select BR2_PACKAGE_LIBPNG
 	help
-	  Enable PNG library support for OpenCV.
+	  Use shared libpng from the target system.
 
-config BR2_PACKAGE_OPENCV_QT
-	bool "Qt Framework support"
-	depends on BR2_PACKAGE_OPENCV
-	depends on BR2_PACKAGE_QT
+config BR2_PACKAGE_OPENCV_WITH_TIFF
+	bool "tiff support"
+	select BR2_PACKAGE_TIFF
 	help
-	  Enable Qt framework support for OpenCV. This requires Qt framework.
+	  Use shared libtiff from the target system.
 
-comment "OpenCV Qt support depends on Qt framework"
-	depends on BR2_PACKAGE_OPENCV
-	depends on !BR2_PACKAGE_QT
-
-config BR2_PACKAGE_OPENCV_FFMPEG
-	bool "FFmpeg support"
-	depends on BR2_PACKAGE_OPENCV
-	depends on BR2_PACKAGE_FFMPEG
+config BR2_PACKAGE_OPENCV_WITH_V4L
+	bool "v4l support"
+	depends on BR2_LARGEFILE
+	select BR2_PACKAGE_LIBV4L
 	help
-	  Enable FFmpeg support for OpenCV. This requires FFmpeg.
+	  Enable Video 4 Linux support.
 
-comment "OpenCV FFmpeg support depends on FFmpeg"
-	depends on BR2_PACKAGE_OPENCV
-	depends on !BR2_PACKAGE_FFMPEG
+comment "v4l support requires a toolchain with LARGEFILE support"
+	depends on !BR2_LARGEFILE
 
-config BR2_PACKAGE_OPENCV_GSTREAMER
-	bool "GStreamer support"
-	depends on BR2_PACKAGE_OPENCV
-	depends on BR2_PACKAGE_GSTREAMER
-	help
-	  Enable GStreamer framework support for OpenCV. This requires
-	  GStreamer framework.
+endif # BR2_PACKAGE_OPENCV
 
-comment "OpenCV GStreamer support depends on GStreamer framework"
-	depends on BR2_PACKAGE_OPENCV
-	depends on !BR2_PACKAGE_GSTREAMER
-
-config BR2_PACKAGE_OPENCV_LIBGTK2
-	bool "GTK+ 2 support"
-	depends on BR2_PACKAGE_OPENCV
-	depends on BR2_PACKAGE_LIBGTK2
-	help
-	  Enable GTK+ 2 GUI library support for OpenCV. This requires 
-	  GTK+ 2 GUI library.
-
-comment "OpenCV GTK+ 2 support depends on GTK+ 2"
-	depends on BR2_PACKAGE_OPENCV
-	depends on !BR2_PACKAGE_LIBGTK2
-
-config BR2_PACKAGE_OPENCV_LIBV4L
-	bool "V4L support"
-	depends on BR2_PACKAGE_OPENCV
-	depends on BR2_PACKAGE_LIBV4L
-	help
-	  Enable V4L (v4l2 - video for linux 2) support for OpenCV. 
-	  This requires V4L library.
-
-comment "OpenCV V4L support depends on V4L library"
-	depends on BR2_PACKAGE_OPENCV
-	depends on !BR2_PACKAGE_LIBV4L
-
-config BR2_PACKAGE_OPENCV_PYTON
-	bool "Python language support"
-	depends on BR2_PACKAGE_OPENCV
-	depends on BR2_PACKAGE_PYTHON
-	help
-	  Enable python language interpreter support for OpenCV.
-	  This requires python language interpreter.
-
-comment "OpenCV python support depends on python"
-	depends on BR2_PACKAGE_OPENCV
-	depends on !BR2_PACKAGE_PYTHON
+comment "opencv requires a toolchain with C++ and WCHAR support"
+	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_USE_WCHAR

@@ -24,7 +24,7 @@
 #--------------------------------------------------------------
 
 # Set and export the version string
-export BR2_VERSION:=2011.05-mg00
+export BR2_VERSION:=2011.11
 
 # This top-level Makefile can *not* be executed in parallel
 .NOTPARALLEL:
@@ -32,12 +32,12 @@ export BR2_VERSION:=2011.05-mg00
 # absolute path
 TOPDIR:=$(shell pwd)
 CONFIG_CONFIG_IN=Config.in
-CONFIG=package/config
+CONFIG=support/kconfig
 DATE:=$(shell date +%Y%m%d)
 
 # Compute the full local version string so packages can use it as-is
 # Need to export it, so it can be got from environment in children (eg. mconf)
-export BR2_VERSION_FULL:=$(BR2_VERSION)$(shell $(TOPDIR)/scripts/setlocalversion)
+export BR2_VERSION_FULL:=$(BR2_VERSION)$(shell $(TOPDIR)/support/scripts/setlocalversion)
 
 noconfig_targets:=menuconfig nconfig gconfig xconfig config oldconfig randconfig \
 	defconfig %_defconfig savedefconfig allyesconfig allnoconfig silentoldconfig release \
@@ -193,7 +193,7 @@ unexport CFLAGS
 unexport CXXFLAGS
 unexport GREP_OPTIONS
 
-GNU_HOST_NAME:=$(shell package/gnuconfig/config.guess)
+GNU_HOST_NAME:=$(shell support/gnuconfig/config.guess)
 
 #############################################################
 #
@@ -222,16 +222,6 @@ HOST_EXEEXT:=.exe
 HOST_LIBEXT:=.lib
 HOST_SHREXT:=.dll
 endif
-
-# The preferred type of libs we build for the target
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
-LIBTGTEXT=.a
-#PREFERRED_LIB_FLAGS:=--disable-shared --enable-static
-else
-LIBTGTEXT=.so
-#PREFERRED_LIB_FLAGS:=--disable-static --enable-shared
-endif
-PREFERRED_LIB_FLAGS:=--enable-static --enable-shared
 
 ##############################################################
 #
@@ -271,6 +261,7 @@ KERNEL_ARCH:=$(shell echo "$(ARCH)" | sed -e "s/-.*//" \
 
 ZCAT:=$(call qstrip,$(BR2_ZCAT))
 BZCAT:=$(call qstrip,$(BR2_BZCAT))
+XZCAT:=$(call qstrip,$(BR2_XZCAT))
 TAR_OPTIONS=$(call qstrip,$(BR2_TAR_OPTIONS)) -xf
 
 GNU_TARGET_SUFFIX:=-$(call qstrip,$(BR2_GNU_TARGET_SUFFIX))
@@ -316,6 +307,13 @@ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL),y)
 include toolchain/toolchain-external.mk
 else ifeq ($(BR2_TOOLCHAIN_CTNG),y)
 include toolchain/toolchain-crosstool-ng.mk
+endif
+
+# Include the package override file if one has been provided in the
+# configuration.
+PACKAGE_OVERRIDE_FILE=$(call qstrip,$(BR2_PACKAGE_OVERRIDE_FILE))
+ifneq ($(PACKAGE_OVERRIDE_FILE),)
+-include $(PACKAGE_OVERRIDE_FILE)
 endif
 
 include package/*/*.mk
@@ -434,7 +432,7 @@ erase-fakeroots:
 
 target-finalize:
 ifeq ($(BR2_HAVE_DEVFILES),y)
-	( scripts/copy.sh $(STAGING_DIR) $(TARGET_DIR) )
+	( support/scripts/copy.sh $(STAGING_DIR) $(TARGET_DIR) )
 else
 	rm -rf $(TARGET_DIR)/usr/include $(TARGET_DIR)/usr/lib/pkgconfig $(TARGET_DIR)/usr/share/aclocal
 	find $(TARGET_DIR)/lib \( -name '*.a' -o -name '*.la' \) -print0 | xargs -0 rm -f
@@ -495,10 +493,7 @@ target-purgelocales:
 	done
 endif
 
-source: $(TARGETS_SOURCE) $(HOST_SOURCE)
-
-_source-check:
-	$(MAKE) DL_MODE=SOURCE_CHECK $(EXTRAMAKEARGS) source
+source: dirs $(TARGETS_SOURCE) $(HOST_SOURCE)
 
 external-deps:
 	@$(MAKE) -Bs DL_MODE=SHOW_EXTERNAL_DEPS $(EXTRAMAKEARGS) source | sort -u
@@ -604,7 +599,7 @@ savedefconfig: $(BUILD_DIR)/buildroot-config/conf outputmakefile
 
 # check if download URLs are outdated
 source-check: allyesconfig
-	$(MAKE) $(EXTRAMAKEARGS) _source-check
+	$(MAKE) DL_MODE=SOURCE_CHECK $(EXTRAMAKEARGS) source
 
 endif # ifeq ($(BR2_HAVE_DOT_CONFIG),y)
 
@@ -619,7 +614,7 @@ endif # ifeq ($(BR2_HAVE_DOT_CONFIG),y)
 # output directory.
 outputmakefile:
 ifeq ($(NEED_WRAPPER),y)
-	$(Q)$(TOPDIR)/scripts/mkmakefile $(TOPDIR) $(O)
+	$(Q)$(TOPDIR)/support/scripts/mkmakefile $(TOPDIR) $(O)
 endif
 
 clean:
@@ -664,6 +659,7 @@ ifeq ($(BR2_PACKAGE_BUSYBOX),y)
 endif
 ifeq ($(BR2_LINUX_KERNEL),y)
 	@echo '  linux-menuconfig       - Run Linux kernel menuconfig'
+	@echo '  linux-savedefconfig    - Run Linux kernel savedefconfig'
 endif
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT),y)
 	@echo '  uclibc-menuconfig      - Run uClibc menuconfig'
@@ -671,6 +667,18 @@ endif
 ifeq ($(BR2_TOOLCHAIN_CTNG),y)
 	@echo '  ctng-menuconfig        - Run crosstool-NG menuconfig'
 endif
+ifeq ($(BR2_TARGET_BAREBOX),y)
+	@echo '  barebox-menuconfig     - Run barebox menuconfig'
+	@echo '  barebox-savedefconfig  - Run barebox savedefconfig'
+endif
+	@echo
+	@echo 'Documentation:'
+	@echo '  manual                 - build manual in HTML, split HTML, PDF and txt'
+	@echo '  manual-html            - build manual in HTML'
+	@echo '  manual-split-html      - build manual in split HTML'
+	@echo '  manual-pdf             - build manual in PDF'
+	@echo '  manual-txt             - build manual in txt'
+	@echo '  manual-epub            - build manual in ePub'
 	@echo
 	@echo 'Miscellaneous:'
 	@echo '  source                 - download all sources needed for offline-build'
@@ -680,16 +688,65 @@ endif
 	@echo '  make V=0|1             - 0 => quiet build (default), 1 => verbose build'
 	@echo '  make O=dir             - Locate all output files in "dir", including .config'
 	@echo
-	@$(foreach b, $(notdir $(wildcard $(TOPDIR)/configs/*_defconfig)), \
+	@$(foreach b, $(sort $(notdir $(wildcard $(TOPDIR)/configs/*_defconfig))), \
 	  printf "  %-35s - Build for %s\\n" $(b) $(b:_defconfig=);)
 	@echo
-	@echo 'See docs/README and docs/buildroot.html for further details'
+	@echo 'See docs/README, or generate the Buildroot manual for further details'
 	@echo
 
 release: OUT=buildroot-$(BR2_VERSION)
 
 release:
 	git archive --format=tar --prefix=$(OUT)/ master|gzip -9 >$(OUT).tar.gz
+
+################################################################################
+# GENDOC -- generates the make targets needed to build a specific type of
+#           asciidoc documentation.
+#
+#  argument 1 is the name of the document and must be a subdirectory of docs/;
+#             the top-level asciidoc file must have the same name
+#  argument 2 is the type of document to generate (-f argument of a2x)
+#  argument 3 is the document type as used in the make target
+#  argument 4 is the output file extension for the document type
+#  argument 5 is the human text for the document type
+#  argument 6 (optional) are extra arguments for a2x
+#
+# The variable <DOCUMENT_NAME>_SOURCES defines the dependencies.
+################################################################################
+define GENDOC_INNER
+$(1): $(1)-$(3)
+.PHONY: $(1)-$(3)
+$(1)-$(3): $$(O)/docs/$(1)/$(1).$(4)
+
+$$(O)/docs/$(1)/$(1).$(4): docs/$(1)/$(1).txt $$($(call UPPERCASE,$(1))_SOURCES)
+	@echo "Generating $(5) $(1)..."
+	$(Q)mkdir -p $$(O)/docs/$(1)/$(2)
+	$(Q)a2x $(6) -f $(2) -d book -L -r $(TOPDIR)/docs/images \
+	  -D $$(@D) $$<
+endef
+
+################################################################################
+# GENDOC -- generates the make targets needed to build asciidoc documentation.
+#
+#  argument 1 is the name of the document and must be a subdirectory of docs/;
+#             the top-level asciidoc file must have the same name
+#
+# The variable <DOCUMENT_NAME>_SOURCES defines the dependencies.
+################################################################################
+define GENDOC
+$(call GENDOC_INNER,$(1),xhtml,html,html,HTML)
+$(call GENDOC_INNER,$(1),chunked,split-html,chunked,Split HTML)
+$(call GENDOC_INNER,$(1),pdf,pdf,pdf,PDF,--dblatex-opts "-P latex.output.revhistory=0")
+$(call GENDOC_INNER,$(1),text,txt,text,Text)
+$(call GENDOC_INNER,$(1),epub,epub,epub,EPUB)
+clean: clean-$(1)
+clean-$(1):
+	$(Q)$(RM) -rf $(O)/docs/$(1)
+.PHONY: $(1) clean-$(1)
+endef
+
+MANUAL_SOURCES = $(wildcard docs/manual/*.txt) $(wildcard docs/images/*)
+$(eval $(call GENDOC,manual))
 
 .PHONY: $(noconfig_targets)
 

@@ -6,7 +6,6 @@
 
 WPA_SUPPLICANT_VERSION = 0.7.3
 WPA_SUPPLICANT_SITE = http://hostap.epitest.fi/releases
-WPA_SUPPLICANT_DEPENDENCIES =
 WPA_SUPPLICANT_CONFIG = $(WPA_SUPPLICANT_DIR)/wpa_supplicant/.config
 WPA_SUPPLICANT_SUBDIR = wpa_supplicant
 WPA_SUPPLICANT_TARGET_BINS = wpa_cli wpa_supplicant wpa_passphrase
@@ -107,4 +106,4 @@ define WPA_SUPPLICANT_UNINSTALL_TARGET_CMDS
 	rm -f $(TARGET_DIR)/usr/share/dbus-1/system-services/$(WPA_SUPPLICANT_DBUS_SERVICE).service
 endef
 
-$(eval $(call AUTOTARGETS,package,wpa_supplicant))
+$(eval $(call AUTOTARGETS))

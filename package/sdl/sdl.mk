@@ -40,6 +40,10 @@ ifeq ($(BR2_PACKAGE_TSLIB),y)
 SDL_DEPENDENCIES += tslib
 endif
 
+ifeq ($(BR2_PACKAGE_ALSA_LIB),y)
+SDL_DEPENDENCIES += alsa-lib
+endif
+
 SDL_CONF_OPT += --enable-pulseaudio=no \
 		--disable-arts \
 		--disable-esd \
@@ -63,4 +67,4 @@ define SDL_INSTALL_TARGET_CMDS
 	cp -dpf $(STAGING_DIR)/usr/lib/libSDL*.so* $(TARGET_DIR)/usr/lib/
 endef
 
-$(eval $(call AUTOTARGETS,package,sdl))
+$(eval $(call AUTOTARGETS))
