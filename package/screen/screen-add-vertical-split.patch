@@ -5,7 +5,7 @@ diff -BENbdpru old/comm.c new/comm.c
    { "vbellwait",	ARGS_1 },
    { "verbose",		ARGS_01 },
    { "version",		ARGS_0 },
-+  { "vert_split",		NEED_DISPLAY|ARGS_0 },
++  { "vert_split",	ARGS_0 },
    { "wall",		NEED_DISPLAY|ARGS_1},
    { "width",		ARGS_0123 },
    { "windowlist",	NEED_DISPLAY|ARGS_012 },
