@@ -552,7 +552,7 @@ diff -Nuar a/yavta.c b/yavta.c
 +			if (pattern) {
 +				video_save_image(dev, &buf, pattern, i);
 +			}
-+			else if(do_stdout) {
++			else if (do_stdout) {
 +				ret = fwrite(dev->buffers[buf.index].mem, 1, buf.bytesused, stdout);
 +				if (ret < 0)
 +					fprintf(stderr, "write to stdout error: %s (%d)\n", strerror(errno), errno);
@@ -636,6 +636,7 @@ diff -Nuar a/yavta.c b/yavta.c
 +	fprintf(stderr, "\tFor video capture devices, the first '#' character in the file name is\n");
 +	fprintf(stderr, "\texpanded to the frame sequence number. The default file name is\n");
 +	fprintf(stderr, "\t'frame-#.bin'.\n");
++	fprintf(stderr, "    --stdout			Write frames to stdout\n");
 +	fprintf(stderr, "-h, --help			Show this help screen\n");
 +	fprintf(stderr, "-i, --input input		Select the video input\n");
 +	fprintf(stderr, "-I, --fill-frames		Fill frames with check pattern before queuing them\n");
@@ -657,7 +658,6 @@ diff -Nuar a/yavta.c b/yavta.c
 +	fprintf(stderr, "    --skip n			Skip the first n frames\n");
 +	fprintf(stderr, "    --sleep-forever		Sleep forever after configuring the device\n");
 +	fprintf(stderr, "    --stride value		Line stride in bytes\n");
-+	fprintf(stderr, "    --stdout           Write frames to stdout\n");
  }
  
  #define OPT_ENUM_FORMATS	256
