@@ -29,14 +29,25 @@ else ifeq ($(BR2_TARGET_UBOOT_FORMAT_LDR),y)
 UBOOT_BIN          = u-boot.ldr
 else ifeq ($(BR2_TARGET_UBOOT_FORMAT_NAND_BIN),y)
 UBOOT_BIN          = u-boot-nand.bin
+else ifeq ($(BR2_TARGET_UBOOT_FORMAT_IMG),y)
+UBOOT_BIN          = u-boot.img
 else
 UBOOT_BIN          = u-boot.bin
+endif
+
+ifeq ($(BR2_TARGET_UBOOT_SPL),y)
+UBOOT_SPL = MLO
+endif
+
+ifeq ($(BR2_TARGET_UBOOT_UENV_PARAMETERS),y)
+UBOOT_UENV = uEnv.txt
 endif
 
 UBOOT_ARCH=$(KERNEL_ARCH)
 
 UBOOT_CONFIGURE_OPTS += CONFIG_NOSOFTFLOAT=1
 UBOOT_MAKE_OPTS += \
+	EXTRAVERSION=$(BR2_TARGET_UBOOT_EXTRAVERSION) \
 	CROSS_COMPILE="$(CCACHE) $(TARGET_CROSS)" \
 	ARCH=$(UBOOT_ARCH)
 
@@ -88,6 +99,14 @@ endef
 
 define UBOOT_INSTALL_IMAGES_CMDS
 	cp -dpf $(@D)/$(UBOOT_BIN) $(BINARIES_DIR)/
+	if [ $(BR2_TARGET_UBOOT_SPL) = y ]; then \
+		cp -dpf $(@D)/$(UBOOT_SPL) $(BINARIES_DIR)/; \
+	fi
+	if [ $(BR2_TARGET_UBOOT_UENV_PARAMETERS) = y ]; then \
+		echo "mpurate="$(BR2_TARGET_UBOOT_UENV_MPURATE) >> $(BINARIES_DIR)/$(UBOOT_UENV); \
+		echo "dvimode="$(BR2_TARGET_UBOOT_UENV_DVIMODE) >> $(BINARIES_DIR)/$(UBOOT_UENV); \
+		echo "uenvcmd="$(BR2_TARGET_UBOOT_UENV_BOOT_CMD) >> $(BINARIES_DIR)/$(UBOOT_UENV); \
+	fi
 endef
 
 $(eval $(call GENTARGETS))
