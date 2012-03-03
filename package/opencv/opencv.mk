@@ -4,7 +4,7 @@
 #
 #############################################################
 OPENCV_SERIES  = 2.3
-OPENCV_VERSION = $(OPENCV_SERIES).0
+OPENCV_VERSION = $(OPENCV_SERIES).1a
 OPENCV_SITE    = http://$(BR2_SOURCEFORGE_MIRROR).dl.sourceforge.net/project/opencvlibrary/opencv-unix/$(OPENCV_SERIES)
 OPENCV_SOURCE  = OpenCV-$(OPENCV_VERSION).tar.bz2
 OPENCV_INSTALL_STAGING = YES

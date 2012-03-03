@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# Start the ALSA.
+#
+
+# Make sure the alsactl progam exists
+[ -f /usr/sbin/alsactl ] || exit 0
+
+ALSA_BB_XM_STATE=/var/lib/alsa/asound-bb-xm.state
+
+case "$1" in
+  start)
+	echo -n "Starting ALSA... "
+	/usr/sbin/alsactl -f $ALSA_BB_XM_STATE restore
+	echo "done."
+	;;
+  stop)
+	echo -n "Stopping ALSA... "
+	/usr/sbin/alsactl -f $ALSA_BB_XM_STATE store
+	echo "done."
+	;;
+  restart|reload)
+	"$0" stop
+	"$0" start
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|restart|reload}"
+	exit 1
+esac
+
+exit $?
+

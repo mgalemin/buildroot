@@ -1,0 +1,24 @@
+diff -Nuar a/ffmpeg/libavcodec/arm/asm-offsets.h b/ffmpeg/libavcodec/arm/asm-offsets.h
+--- a/ffmpeg/libavcodec/arm/asm-offsets.h	2011-01-10 02:23:00.000000000 +1100
++++ b/ffmpeg/libavcodec/arm/asm-offsets.h	2012-02-25 16:48:13.714285312 +1100
+@@ -35,7 +35,7 @@
+ #define AC_PRED                  0xae0
+ #define BLOCK_LAST_INDEX         0x21c0
+ #define INTER_SCANTAB_RASTER_END 0x23c0
+-#define H263_AIC                 0x2670
++#define H263_AIC                 0x2678
+ #elif defined(__APPLE__)
+ #define Y_DC_SCALE               0xa70
+ #define C_DC_SCALE               0xa74
+diff -Nuar a/Makefile b/Makefile
+--- a/Makefile	2012-02-25 17:10:41.000000000 +1100
++++ b/Makefile	2012-02-25 17:12:00.908799277 +1100
+@@ -935,7 +935,7 @@
+ 	$(INSTALL) -d $(BINDIR) $(CONFDIR) $(LIBDIR)
+ 
+ install-%: %$(EXESUF) install-dirs
+-	$(INSTALL) -m 755 $(INSTALLSTRIP) $< $(BINDIR)
++	$(INSTALL) -m 755 $< $(BINDIR)
+ 
+ install-gui: install-mplayer
+ 	-ln -sf mplayer$(EXESUF) $(BINDIR)/gmplayer$(EXESUF)

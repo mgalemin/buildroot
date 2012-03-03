@@ -33,8 +33,8 @@ else
 UBOOT_BIN          = u-boot.bin
 endif
 
-ifeq ($(BR2_TARGET_UBOOT_MLO),y)
-UBOOT_MLO = MLO
+ifeq ($(BR2_TARGET_UBOOT_SPL),y)
+UBOOT_SPL = MLO
 endif
 
 ifeq ($(BR2_TARGET_UBOOT_UENV_PARAMETERS),y)
@@ -97,11 +97,12 @@ endef
 
 define UBOOT_INSTALL_IMAGES_CMDS
 	cp -dpf $(@D)/$(UBOOT_BIN) $(BINARIES_DIR)/
-	if [ $(BR2_TARGET_UBOOT_MLO) = y ]; then \
-		cp -dpf $(@D)/$(UBOOT_MLO) $(BINARIES_DIR)/; \
+	if [ $(BR2_TARGET_UBOOT_SPL) = y ]; then \
+		cp -dpf $(@D)/$(UBOOT_SPL) $(BINARIES_DIR)/; \
 	fi
 	if [ $(BR2_TARGET_UBOOT_UENV_PARAMETERS) = y ]; then \
 		echo "mpurate="$(BR2_TARGET_UBOOT_UENV_MPURATE) >> $(BINARIES_DIR)/$(UBOOT_UENV); \
+		echo "dvimode="$(BR2_TARGET_UBOOT_UENV_DVIMODE) >> $(BINARIES_DIR)/$(UBOOT_UENV); \
 		echo "uenvcmd="$(BR2_TARGET_UBOOT_UENV_BOOT_CMD) >> $(BINARIES_DIR)/$(UBOOT_UENV); \
 	fi
 endef
