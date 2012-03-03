@@ -18,6 +18,7 @@ define HOST_LIBXML_PARSER_PERL_CONFIGURE_CMDS
         EXPATINCPATH=$(HOST_DIR)/usr/include \
         INSTALLDIRS=site \
         INSTALLSITELIB=$(HOST_DIR)/usr/lib/perl \
+        INSTALLSITEARCH=$(HOST_DIR)/usr/lib/perl \
  )
 endef
 
@@ -29,6 +30,6 @@ define HOST_LIBXML_PARSER_PERL_INSTALL_CMDS
  $(HOST_MAKE_ENV) $(MAKE) -C $(@D) install
 endef
 
-$(eval $(call GENTARGETS,package,libxml-parser-perl))
-$(eval $(call GENTARGETS,package,libxml-parser-perl,host))
+$(eval $(call GENTARGETS))
+$(eval $(call GENTARGETS,host))
 

@@ -1,0 +1,11 @@
+diff -Nuar a/configure b/configure
+--- a/configure	2012-02-28 09:20:49.809882513 +1100
++++ b/configure	2012-02-28 09:20:42.785882352 +1100
+@@ -32,6 +32,7 @@
+ esac
+ fi
+ 
++fu_cv_sys_stat_statfs2_bsize=yes
+ 
+ as_nl='
+ '

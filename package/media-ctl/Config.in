@@ -1,0 +1,4 @@
+config BR2_PACKAGE_MEDIA_CTL
+    bool "media-ctl"
+    help
+        Media controller control application

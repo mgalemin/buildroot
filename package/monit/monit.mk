@@ -3,7 +3,7 @@
 # monit
 #
 #############################################################
-MONIT_VERSION = 5.2.5
+MONIT_VERSION = 5.3.2
 MONIT_SITE = http://mmonit.com/monit/dist/
 
 ifneq ($(BR2_PACKAGE_OPENSSL),y)
@@ -17,7 +17,7 @@ endif
 
 define MONIT_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 $(@D)/monit $(TARGET_DIR)/usr/bin/monit
-	$(INSTALL) -m 0644 $(@D)/monitrc $(TARGET_DIR)/etc/monitrc
+	$(INSTALL) -m 0700 $(@D)/monitrc $(TARGET_DIR)/etc/monitrc
 	$(INSTALL) -d -m 0777 $(TARGET_DIR)/etc/monit.d
 endef
 

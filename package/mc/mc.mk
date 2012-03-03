@@ -3,9 +3,10 @@
 # mc
 #
 #############################################################
-MC_VERSION = 4.7.5.2
+MC_VERSION = 4.8.1
 MC_SITE = http://www.midnight-commander.org/downloads/
-MC_DEPENDENCIES += ncurses
+MC_SOURCE = mc-$(MC_VERSION).tar.bz2
+MC_DEPENDENCIES += ncurses libglib2
 MC_CONF_OPT += \
 	--with-screen=ncurses \
 	--with-ncurses-libs=$(STAGING_DIR)/usr/lib \

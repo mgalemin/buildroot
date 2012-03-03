@@ -1,0 +1,14 @@
+diff -Nuar a/monitrc b/monitrc
+--- a/monitrc	2011-12-21 07:40:30.000000000 +1100
++++ b/monitrc	2012-02-28 22:42:05.839761953 +1100
+@@ -117,8 +117,8 @@
+     use address localhost  # only accept connection from localhost
+     allow localhost        # allow localhost to connect to the server and
+     allow admin:monit      # require user 'admin' with password 'monit'
+-    allow @monit           # allow users of group 'monit' to connect (rw)
+-    allow @users readonly  # allow users of group 'users' to connect readonly
++#    allow @monit           # allow users of group 'monit' to connect (rw)
++#    allow @users readonly  # allow users of group 'users' to connect readonly
+ 
+ ###############################################################################
+ ## Services

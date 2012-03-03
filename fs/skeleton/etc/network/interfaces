@@ -2,6 +2,3 @@
 auto lo
 iface lo inet loopback
 
-auto eth0
-iface eth0 inet dhcp
-hwaddress ether 00:00:de:ad:be:ef
