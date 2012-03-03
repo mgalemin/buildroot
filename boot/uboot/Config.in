@@ -122,6 +122,12 @@ config BR2_TARGET_UBOOT_UENV_MPURATE
 	help
 	  MPU frequency
 
+config BR2_TARGET_UBOOT_UENV_DVIMODE
+	string "dvimode"
+	default "1024x768MR-16@60"
+	help
+	  DVI output mode
+
 config BR2_TARGET_UBOOT_UENV_BOOT_CMD
 	string "uenvcmd"
 	default "mmc init; run loaduimagefat; run mmcboot"

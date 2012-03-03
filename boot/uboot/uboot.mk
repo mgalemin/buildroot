@@ -102,6 +102,7 @@ define UBOOT_INSTALL_IMAGES_CMDS
 	fi
 	if [ $(BR2_TARGET_UBOOT_UENV_PARAMETERS) = y ]; then \
 		echo "mpurate="$(BR2_TARGET_UBOOT_UENV_MPURATE) >> $(BINARIES_DIR)/$(UBOOT_UENV); \
+		echo "dvimode="$(BR2_TARGET_UBOOT_UENV_DVIMODE) >> $(BINARIES_DIR)/$(UBOOT_UENV); \
 		echo "uenvcmd="$(BR2_TARGET_UBOOT_UENV_BOOT_CMD) >> $(BINARIES_DIR)/$(UBOOT_UENV); \
 	fi
 endef
