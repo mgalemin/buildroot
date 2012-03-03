@@ -24,7 +24,13 @@
 #--------------------------------------------------------------
 
 # Set and export the version string
-export BR2_VERSION:=2011.11
+export BR2_VERSION:=2012.02
+
+# Check for minimal make version (note: this check will break at make 10.x)
+MIN_MAKE_VERSION=3.81
+ifneq ($(firstword $(sort $(MAKE_VERSION) $(MIN_MAKE_VERSION))),$(MIN_MAKE_VERSION))
+$(error You have make '$(MAKE_VERSION)' installed. GNU make >= $(MIN_MAKE_VERSION) is required)
+endif
 
 # This top-level Makefile can *not* be executed in parallel
 .NOTPARALLEL:
@@ -192,6 +198,7 @@ unexport CPP
 unexport CFLAGS
 unexport CXXFLAGS
 unexport GREP_OPTIONS
+unexport CONFIG_SITE
 
 GNU_HOST_NAME:=$(shell support/gnuconfig/config.guess)
 
@@ -277,8 +284,6 @@ TARGET_DIR:=$(BASE_DIR)/target
 TOOLCHAIN_DIR=$(BASE_DIR)/toolchain
 TARGET_SKELETON=$(TOPDIR)/fs/skeleton
 
-BR2_DEPENDS_DIR=$(BUILD_DIR)/buildroot-config
-
 ifeq ($(BR2_CCACHE),y)
 CCACHE:=$(HOST_DIR)/usr/bin/ccache
 CCACHE_CACHE_DIR=$(HOME)/.buildroot-ccache
@@ -297,6 +302,8 @@ include package/Makefile.in
 #############################################################
 
 all: world
+
+include support/dependencies/dependencies.mk
 
 # We also need the various per-package makefiles, which also add
 # each selected package to TARGETS if that package was selected
@@ -359,7 +366,7 @@ HOST_SOURCE += $(addsuffix -source,$(sort $(TARGETS_HOST_DEPS) $(HOST_DEPS)))
 $(TARGETS_ALL): __real_tgt_%: $(BASE_TARGETS) %
 
 dirs: $(DL_DIR) $(TOOLCHAIN_DIR) $(BUILD_DIR) $(STAGING_DIR) $(TARGET_DIR) \
-	$(HOST_DIR) $(BR2_DEPENDS_DIR) $(BINARIES_DIR) $(STAMP_DIR)
+	$(HOST_DIR) $(BINARIES_DIR) $(STAMP_DIR)
 
 $(BASE_TARGETS): dirs $(O)/toolchainfile.cmake
 
@@ -368,7 +375,7 @@ $(BUILD_DIR)/buildroot-config/auto.conf: $(CONFIG_DIR)/.config
 
 prepare: $(BUILD_DIR)/buildroot-config/auto.conf
 
-world: prepare dependencies dirs $(BASE_TARGETS) $(TARGETS_ALL)
+world: prepare dirs dependencies $(BASE_TARGETS) $(TARGETS_ALL)
 
 $(O)/toolchainfile.cmake:
 	@echo -en "\
@@ -390,7 +397,7 @@ $(O)/toolchainfile.cmake:
 	$(BASE_TARGETS) $(TARGETS) $(TARGETS_ALL) \
 	$(TARGETS_CLEAN) $(TARGETS_DIRCLEAN) $(TARGETS_SOURCE) \
 	$(DL_DIR) $(TOOLCHAIN_DIR) $(BUILD_DIR) $(STAGING_DIR) $(TARGET_DIR) \
-	$(HOST_DIR) $(BR2_DEPENDS_DIR) $(BINARIES_DIR) $(STAMP_DIR)
+	$(HOST_DIR) $(BINARIES_DIR) $(STAMP_DIR)
 
 #############################################################
 #
@@ -696,8 +703,15 @@ endif
 
 release: OUT=buildroot-$(BR2_VERSION)
 
+# Create release tarballs. We need to fiddle a bit to add the generated
+# documentation to the git output
 release:
-	git archive --format=tar --prefix=$(OUT)/ master|gzip -9 >$(OUT).tar.gz
+	git archive --format=tar --prefix=$(OUT)/ master > $(OUT).tar
+	$(MAKE) O=$(OUT) manual-html manual-txt manual-pdf
+	tar rf $(OUT).tar $(OUT)
+	gzip -9 -c < $(OUT).tar > $(OUT).tar.gz
+	bzip2 -9 -c < $(OUT).tar > $(OUT).tar.bz2
+	rm -rf $(OUT) $(OUT).tar
 
 ################################################################################
 # GENDOC -- generates the make targets needed to build a specific type of
@@ -720,7 +734,7 @@ $(1)-$(3): $$(O)/docs/$(1)/$(1).$(4)
 
 $$(O)/docs/$(1)/$(1).$(4): docs/$(1)/$(1).txt $$($(call UPPERCASE,$(1))_SOURCES)
 	@echo "Generating $(5) $(1)..."
-	$(Q)mkdir -p $$(O)/docs/$(1)/$(2)
+	$(Q)mkdir -p $$(@D)
 	$(Q)a2x $(6) -f $(2) -d book -L -r $(TOPDIR)/docs/images \
 	  -D $$(@D) $$<
 endef
