@@ -20,4 +20,4 @@ BR2_TARGET_UBOOT_UENV_PARAMETERS=y
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_PATCH="board/beagleboard/xm/kernel-patches/"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
-BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="board/beagleboard/xm/linux-3.2.9.config"
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="board/beagleboard/xm/linux-3.2.8.config"
